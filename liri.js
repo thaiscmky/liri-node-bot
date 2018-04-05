@@ -22,7 +22,7 @@ function testCommands(){
     - liri.js my-tweets //shows last 20 tweets\n
     - liri.js movie-this "Movie you want to search for" //gets information about movie\n
     - liri.js spotify-this-song "Song you want to search for" //gets information about the song\n
-    - liri.js do-what-it-says //runs a list of commands based on chores.txt`);
+    - liri.js do-what-it-says //runs a list of commands based on chores.txt\n`);
     //User input should have no more than 2 arguments
     console.assert(userInputArr.length < 3, `Too many arguments; are you entering 'node liri.js [what-to-do] "what to search"'?`);
     //User asks to search for movie "Black Panther"
@@ -42,3 +42,19 @@ function testCommands(){
     console.log("#####################");
 }
 
+function issueCommand(args){
+    //convert lower-case-and-dashes to camelCasing
+    args[0] = args[0].replace(/(-.)/g, function(match){
+        return match[1].toUpperCase()
+    });
+    var fx = args.length > 1 ? `${args[0]}("${args[1]}")` : `${args[0]}()`;
+
+    if(typeof window[args[0]] !== "function")
+        return `That's not a valid command. Here are your options:\n
+    - liri.js my-tweets //shows last 20 tweets\n
+    - liri.js movie-this "Movie you want to search for" //gets information about movie\n
+    - liri.js spotify-this-song "Song you want to search for" //gets information about the song\n
+    - liri.js do-what-it-says //runs a list of commands based on chores.txt\n`;
+
+    eval(fx);
+}
