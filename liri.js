@@ -1,3 +1,3 @@
-/**
- * Created by dynom on 4/5/2018.
- */
+var env = require("dotenv");
+//initiate environment variables
+env.config();
