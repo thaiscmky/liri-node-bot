@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/thaiscmky/liri-node-bot#readme",
   "dependencies": {
+    "request": "^2.85.0",
     "twitter": "^1.7.1"
   }
 }
