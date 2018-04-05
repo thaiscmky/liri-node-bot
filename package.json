@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/thaiscmky/liri-node-bot/issues"
   },
-  "homepage": "https://github.com/thaiscmky/liri-node-bot#readme"
+  "homepage": "https://github.com/thaiscmky/liri-node-bot#readme",
+  "dependencies": {
+    "twitter": "^1.7.1"
+  }
 }
