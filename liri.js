@@ -7,20 +7,20 @@ var fs = require("fs");
 var keys = require("./keys.js");
 var request = require("request");
 var Twitter = require("twitter");
-var spotify = require("node-spotify-api");
+var Spotify  = require("node-spotify-api");
 var userInputArr = process.argv;
 userInputArr.splice(0,2);
 
 var commands = {
-    movieThis: function(movie) {
-        var results = [];
+    movieThis: function(movie, msg) {
         //Setup a default in case of null
-        if (typeof movie === null)
+        if (movie === null)
             movie = "Mr. Nobody";
 
         var queryURL = "https://www.omdbapi.com/?t=" + movie + "&y=&imdbRating=&tomatoRating=&country=&language=&plot=short&actors=&apikey=trilogy";
 
         request(queryURL, function (error, response, body) {
+            if(msg !== null && typeof msg !== 'undefined') console.log(msg);
             if (!error && response.statusCode === 200) {
                 var dataObj = JSON.parse(body);
                 loopThroughResults([
@@ -39,11 +39,11 @@ var commands = {
             }
         });
     },
-    myTweets: function() {
+    myTweets: function(msg) {
         var twitterClient = new Twitter(keys.twitter);
         twitterClient.get('statuses/user_timeline', function (error, tweets, response) {
-
-            if (!error && response.statusCode === 200) {
+            if(msg !== null  && typeof msg !== 'undefined') console.log(msg);
+            if(!error && response.statusCode === 200) {
                 console.log(`Liri's last 20 tweets:`);
                 tweets.forEach(function(tweet, i){
                    if(i > 20)
@@ -59,41 +59,53 @@ var commands = {
             }
         })
     },
+    spotifyThisSong: function(song, msg){
+        //Setup a default in case of null
+        if (song === null)
+            song = "The Sign";
+        var spotifyAPI = new Spotify(keys.spotify);
+        spotifyAPI.search({ type: 'track', query: song, limit: 1 }, function (error, data) {
+            if(msg !== null && typeof msg !== 'undefined') console.log(msg);
+            if(!error) {
+                loopThroughResults([
+                    `Artist: ${data.tracks.items[0].album.artists[0].name}`,
+                    `Track: ${data.tracks.items[0].name}`,
+                    `Preview: ${data.tracks.items[0].preview_url === null ? data.tracks.items[0].href : data.tracks.items[0].preview_url}`,
+                    `Album: ${data.tracks.items[0].album.artists[0].name}`
+                ]);
+            } else {
+                console.log('Something went wrong and we could not retrieve the information from the server...');
+                if (error) throw error;
+            }
+        });
+    }
 };
 
 testCommands();
 
 function testCommands(){
 
-    console.log("#####################");
-    console.log("Running initial tests");
+    console.log("Running initial tests:\n##########################");
 
     //User input should have at least one argument
-    console.assert(userInputArr.length > 0, `You forgot to enter a command. Here are your options:\n
-    - liri.js my-tweets //shows last 20 tweets\n
-    - liri.js movie-this "Movie you want to search for" //gets information about movie\n
-    - liri.js spotify-this-song "Song you want to search for" //gets information about the song\n
-    - liri.js do-what-it-says //runs a list of commands based on chores.txt\n`);
+    console.assert(userInputArr.length > 0, `You forgot to enter a command. Here are your options:
+    - liri.js my-tweets //shows last 20 tweets
+    - liri.js movie-this "Movie you want to search for" //gets information about movie
+    - liri.js spotify-this-song "Song you want to search for" //gets information about the song
+    - liri.js do-what-it-says //runs a list of commands based on chores.txt\n##########################`);
     //User input should have no more than 2 arguments
-    console.assert(userInputArr.length < 3, `Too many arguments; are you entering 'node liri.js [what-to-do] "what to search"'?`);
+    console.assert(userInputArr.length < 3, `Too many arguments; are you entering 'node liri.js [what-to-do] "what to search"'?\n##########################`);
     //User asks to search for movie "Black Panther"
-    console.log('The following should return an array with information on movie Black Panther. It returns:');
-    issueCommand(['movie-this', 'Black Panther']);
-    /*//User asks to search for song "Money Trees" on spotify
-    console.log('The following should return an array with information on song "Money Trees". It returns:');
-    issueCommand(['spotify-this-song', 'Money Trees']);
-    //User asks to run chores.txt
-    console.log('The following should return at least the results for a search in Spotify for "Hakuna Matata". It returns:');
-    issueCommand(['do-what-it-says']);*/
+    issueCommand(['movie-this', 'Black Panther'], 'The following should return an array with information on movie Black Panther.\n##########################');
+    //User asks to search for song "Money Trees" on spotify
+    issueCommand(['spotify-this-song', 'Money Trees'], 'The following should return an array with information on song "Money Trees"\n##########################');
+    /*//User asks to run chores.txt
+    issueCommand(['do-what-it-says'],'The following should return at least the results for a search in Spotify for "Hakuna Matata".\n##########################');*/
     //User asks to see user tweets for app
-    console.log('The following should return Liri\'s last 20 tweets. It returns:');
-    issueCommand(['my-tweets']);
-
-    console.log("End of initial tests");
-    console.log("#####################");
+    issueCommand(['my-tweets'], 'The following should return Liri\'s last 20 tweets.\n##########################');
 }
 
-function issueCommand(args){
+function issueCommand(args, msg){
     //convert lower-case-and-dashes to camelCasing
     args[0] = args[0].replace(/(-.)/g, function(match){
         return match[1].toUpperCase()
@@ -108,8 +120,9 @@ function issueCommand(args){
             `);
         return;
     }
-        if(args.length > 1) responseArray.call(this, args[1]);
-        else responseArray.call(this);
+        if(args.length > 1) responseArray.call(this, args[1], msg);
+        else responseArray.call(this, msg);
+
 }
 
 function loopThroughResults(arr){
