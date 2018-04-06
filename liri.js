@@ -98,7 +98,26 @@ var commands = {
     }
 };
 
-testCommands();
+//testCommands();
+requestForInput();
+function requestForInput(){
+    console.log('WELCOME TO LIRI!');
+    var help = `Enter a command. Here are your options:
+    - my-tweets //shows last 20 tweets
+    - movie-this "Movie you want to search for" //gets information about movie
+    - spotify-this-song "Song you want to search for" //gets information about the song
+    - do-what-it-says //runs a list of commands based on chores.txt
+    - exit //leaves the program`
+    console.log(help);
+    var stdin = process.openStdin();
+    stdin.addListener('data', function(input) {
+        var entered = input.toString().trim();
+        if(entered === 'exit')    process.exit();
+        if(entered === 'help')    console.log(help);
+        var args = entered.split(' ');
+        issueCommand(args);
+    });
+}
 
 function testCommands(){
 
@@ -106,10 +125,10 @@ function testCommands(){
 
     //User input should have at least one argument
     console.assert(userInputArr.length > 0, `You forgot to enter a command. Here are your options:
-    - liri.js my-tweets //shows last 20 tweets
-    - liri.js movie-this "Movie you want to search for" //gets information about movie
-    - liri.js spotify-this-song "Song you want to search for" //gets information about the song
-    - liri.js do-what-it-says //runs a list of commands based on chores.txt\n##########################`);
+    - my-tweets //shows last 20 tweets
+    - movie-this "Movie you want to search for" //gets information about movie
+    - spotify-this-song "Song you want to search for" //gets information about the song
+    - do-what-it-says //runs a list of commands based on chores.txt\n##########################`);
     //User input should have no more than 2 arguments
     console.assert(userInputArr.length < 3, `Too many arguments; are you entering 'node liri.js [what-to-do] "what to search"'?\n##########################`);
     //User asks to search for movie "Black Panther"
@@ -130,10 +149,10 @@ function issueCommand(args, msg){
     responseArray = commands[args[0]];
     if(typeof responseArray !== 'function'){
         console.log(`That's not a valid command. Here are your options:
-            - liri.js my-tweets //shows last 20 tweets
-            - liri.js movie-this "Movie you want to search for" //gets information about movie
-            - liri.js spotify-this-song "Song you want to search for" //gets information about the song
-            - liri.js do-what-it-says //runs a list of commands based on chores.txt
+            - my-tweets //shows last 20 tweets
+            - movie-this "Movie you want to search for" //gets information about movie
+            - spotify-this-song "Song you want to search for" //gets information about the song
+            - do-what-it-says //runs a list of commands based on chores.txt
             `);
         return;
     }
@@ -144,22 +163,16 @@ function issueCommand(args, msg){
 
 function performRequestedCommand(command){
     if(command.length > 0){
-        switch(command[0]){
-            case 'my-tweets':
-                break;
-            case 'movie-this':
-                break;
-            case 'spotify-this-song':
-                break;
-            case 'do-what-it-says':
-                break;
-        }
+            if(command.length > 1 )
+                issueCommand(command[0], command[1]);
+            else
+                issueCommand(command[0]);
     } else {
         console.log(`You forgot to enter a command. Here are your options:
-    - liri.js my-tweets //shows last 20 tweets
-    - liri.js movie-this "Movie you want to search for" //gets information about movie
-    - liri.js spotify-this-song "Song you want to search for" //gets information about the song
-    - liri.js do-what-it-says //runs a list of commands based on chores.txt`);
+    - my-tweets //shows last 20 tweets
+    - movie-this "Movie you want to search for" //gets information about movie
+    - spotify-this-song "Song you want to search for" //gets information about the song
+    - do-what-it-says //runs a list of commands based on chores.txt`);
     }
 }
 
