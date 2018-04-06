@@ -107,15 +107,18 @@ function requestForInput(){
     - movie-this "Movie you want to search for" //gets information about movie
     - spotify-this-song "Song you want to search for" //gets information about the song
     - do-what-it-says //runs a list of commands based on chores.txt
-    - exit //leaves the program`
+    - exit //leaves the program
+    - help //provides command options`;
     console.log(help);
     var stdin = process.openStdin();
     stdin.addListener('data', function(input) {
         var entered = input.toString().trim();
         if(entered === 'exit')    process.exit();
         if(entered === 'help')    console.log(help);
-        var args = entered.split(' ');
-        issueCommand(args);
+        else {
+            var args = entered.split(' ');
+            issueCommand(args);
+        }
     });
 }
 
