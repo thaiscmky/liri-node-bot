@@ -3,4 +3,4 @@ Node.js based Language Interpretation and Recognition Interface
 
 ## demo.gif
 
-![app demo]('./image.gif')
+![app demo]('./demo.gif')
