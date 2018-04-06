@@ -78,6 +78,23 @@ var commands = {
                 if (error) throw error;
             }
         });
+    },
+    doWhatItSays: function(msg){
+
+        fs.readFile(`./chores.txt`, "utf8", function(error, data) {
+            if(!error){
+                var list = data.split('\n');
+                list.forEach(function(command){
+                    var args = command.trim().split(',');
+                    if(msg !== null && typeof msg !== 'undefined') issueCommand(args, msg);
+                    else issueCommand(args);
+                });
+
+            } else {
+                console.log('Something went wrong and we could not retrieve the information from the server...');
+                if (error) throw error;
+            }
+        });
     }
 };
 
@@ -99,8 +116,8 @@ function testCommands(){
     issueCommand(['movie-this', 'Black Panther'], 'The following should return an array with information on movie Black Panther.\n##########################');
     //User asks to search for song "Money Trees" on spotify
     issueCommand(['spotify-this-song', 'Money Trees'], 'The following should return an array with information on song "Money Trees"\n##########################');
-    /*//User asks to run chores.txt
-    issueCommand(['do-what-it-says'],'The following should return at least the results for a search in Spotify for "Hakuna Matata".\n##########################');*/
+    //User asks to run chores.txt
+    issueCommand(['do-what-it-says'],'The following should return at least the results for a search in Spotify for "Hakuna Matata".\n##########################');
     //User asks to see user tweets for app
     issueCommand(['my-tweets'], 'The following should return Liri\'s last 20 tweets.\n##########################');
 }
@@ -123,6 +140,27 @@ function issueCommand(args, msg){
         if(args.length > 1) responseArray.call(this, args[1], msg);
         else responseArray.call(this, msg);
 
+}
+
+function performRequestedCommand(command){
+    if(command.length > 0){
+        switch(command[0]){
+            case 'my-tweets':
+                break;
+            case 'movie-this':
+                break;
+            case 'spotify-this-song':
+                break;
+            case 'do-what-it-says':
+                break;
+        }
+    } else {
+        console.log(`You forgot to enter a command. Here are your options:
+    - liri.js my-tweets //shows last 20 tweets
+    - liri.js movie-this "Movie you want to search for" //gets information about movie
+    - liri.js spotify-this-song "Song you want to search for" //gets information about the song
+    - liri.js do-what-it-says //runs a list of commands based on chores.txt`);
+    }
 }
 
 function loopThroughResults(arr){
