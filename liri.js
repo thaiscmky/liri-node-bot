@@ -4,8 +4,9 @@ env.config();
 
 //load required packages
 var fs = require("fs");
+var keys = require("./keys.js");
 var request = require("request");
-var twitter = require("twitter");
+var Twitter = require("twitter");
 var spotify = require("node-spotify-api");
 var userInputArr = process.argv;
 userInputArr.splice(0,2);
@@ -38,6 +39,26 @@ var commands = {
             }
         });
     },
+    myTweets: function() {
+        var twitterClient = new Twitter(keys.twitter);
+        twitterClient.get('statuses/user_timeline', function (error, tweets, response) {
+
+            if (!error && response.statusCode === 200) {
+                console.log(`Liri's last 20 tweets:`);
+                tweets.forEach(function(tweet, i){
+                   if(i > 20)
+                       return;
+                   console.log(`Author: ${tweet.user.name} | Date: ${tweet.created_at}`);
+                   console.log('-----------------------');
+                   console.log(typeof tweet.retweeted_status === null ? tweet.text : tweet.retweeted_status.text + "\n");
+                    console.log('-----------------------');
+                });
+            } else {
+                console.log('Something went wrong and we could not retrieve the information from the server...');
+                if (error) throw error;
+            }
+        })
+    },
 };
 
 testCommands();
@@ -63,10 +84,10 @@ function testCommands(){
     issueCommand(['spotify-this-song', 'Money Trees']);
     //User asks to run chores.txt
     console.log('The following should return at least the results for a search in Spotify for "Hakuna Matata". It returns:');
-    issueCommand(['do-what-it-says']);
+    issueCommand(['do-what-it-says']);*/
     //User asks to see user tweets for app
     console.log('The following should return Liri\'s last 20 tweets. It returns:');
-    issueCommand(['my-tweets']);*/
+    issueCommand(['my-tweets']);
 
     console.log("End of initial tests");
     console.log("#####################");
@@ -79,14 +100,15 @@ function issueCommand(args){
     });
     responseArray = commands[args[0]];
     if(typeof responseArray !== 'function'){
-        console.log(`That's not a valid command. Here are your options:\n
-            - liri.js my-tweets //shows last 20 tweets\n
-            - liri.js movie-this "Movie you want to search for" //gets information about movie\n
-            - liri.js spotify-this-song "Song you want to search for" //gets information about the song\n
-            - liri.js do-what-it-says //runs a list of commands based on chores.txt\n`);
+        console.log(`That's not a valid command. Here are your options:
+            - liri.js my-tweets //shows last 20 tweets
+            - liri.js movie-this "Movie you want to search for" //gets information about movie
+            - liri.js spotify-this-song "Song you want to search for" //gets information about the song
+            - liri.js do-what-it-says //runs a list of commands based on chores.txt
+            `);
         return;
     }
-        if(args.length > 1) responseArray.call(this, args[1])
+        if(args.length > 1) responseArray.call(this, args[1]);
         else responseArray.call(this);
 }
 
